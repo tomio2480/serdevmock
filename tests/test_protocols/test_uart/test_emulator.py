@@ -1,5 +1,6 @@
 """UARTエミュレーションロジックのテスト"""
 
+import socket
 from unittest.mock import MagicMock, patch
 
 from serdevmock.protocols.uart.config import ResponseRule, UARTConfig
@@ -144,3 +145,31 @@ class TestUARTEmulator:
 
         response = emulator._process_request(b"UNKNOWN")
         assert response is None
+
+    @patch("socket.socket")
+    def test_start_with_socket_url(self, mock_socket: MagicMock) -> None:
+        """socket://で始まるポートの場合にTCPサーバーとして起動すること"""
+        config = UARTConfig(
+            port="socket://0.0.0.0:5000",
+            baudrate=9600,
+            data_bits=8,
+            parity="N",
+            stop_bits=1,
+            echo_mode=False,
+            response_rules=[],
+        )
+
+        mock_sock_instance = MagicMock()
+        mock_socket.return_value = mock_sock_instance
+
+        emulator = UARTEmulator(config)
+        emulator.start()
+
+        # ソケットが作成されること
+        mock_socket.assert_called_once_with(socket.AF_INET, socket.SOCK_STREAM)
+
+        # bind, listenが呼ばれること
+        mock_sock_instance.bind.assert_called_once_with(("0.0.0.0", 5000))
+        mock_sock_instance.listen.assert_called_once_with(1)
+
+        assert emulator.is_running() is True

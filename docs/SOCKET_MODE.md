@@ -11,8 +11,10 @@ serdevmockをTCPサーバーとして起動し、テスト対象アプリケー�
 ### 1. serdevmockをTCPモードで起動
 
 ```bash
-serdevmock --protocol uart --port socket://localhost:5000 --config examples/at_command.json
+serdevmock --protocol uart --port socket://0.0.0.0:5000 --config examples/at_command_socket.json
 ```
+
+`socket://` で始まるポート名を指定すると、serdevmockは自動的にTCPサーバーとして起動します。
 
 ### 2. テスト対象アプリケーションから接続
 

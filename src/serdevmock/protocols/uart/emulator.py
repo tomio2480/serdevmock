@@ -1,7 +1,9 @@
 """UARTエミュレータのコアロジック"""
 
+import socket
 import time
 from typing import Optional
+from urllib.parse import urlparse
 
 import serial
 
@@ -20,24 +22,43 @@ class UARTEmulator(ProtocolEmulator):
         """
         self.config = config
         self._serial: Optional[serial.Serial] = None
+        self._socket: Optional[socket.socket] = None
         self._running = False
 
     def start(self) -> None:
         """エミュレータを開始する"""
-        self._serial = serial.serial_for_url(
-            self.config.port,
-            baudrate=self.config.baudrate,
-            bytesize=self.config.data_bits,
-            parity=self.config.parity,
-            stopbits=self.config.stop_bits,
-            timeout=1,
-        )
+        # socket://で始まる場合はTCPサーバーとして起動
+        if self.config.port.startswith("socket://"):
+            self._start_tcp_server()
+        else:
+            self._serial = serial.serial_for_url(
+                self.config.port,
+                baudrate=self.config.baudrate,
+                bytesize=self.config.data_bits,
+                parity=self.config.parity,
+                stopbits=self.config.stop_bits,
+                timeout=1,
+            )
         self._running = True
+
+    def _start_tcp_server(self) -> None:
+        """TCPサーバーとして起動する"""
+        # URLをパース
+        parsed = urlparse(self.config.port)
+        host = parsed.hostname or "0.0.0.0"
+        port = parsed.port or 5000
+
+        # ソケットを作成
+        self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._socket.bind((host, port))
+        self._socket.listen(1)
 
     def stop(self) -> None:
         """エミュレータを停止する"""
         if self._serial and self._serial.is_open:
             self._serial.close()
+        if self._socket:
+            self._socket.close()
         self._running = False
 
     def is_running(self) -> bool:
