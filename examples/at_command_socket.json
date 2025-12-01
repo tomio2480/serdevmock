@@ -1,0 +1,30 @@
+{
+  "port": "socket://0.0.0.0:5000",
+  "baudrate": 9600,
+  "data_bits": 8,
+  "parity": "N",
+  "stop_bits": 1,
+  "echo_mode": false,
+  "response_rules": [
+    {
+      "request_pattern": "AT",
+      "response_data": "OK\r\n",
+      "delay_ms": 100
+    },
+    {
+      "request_pattern": "ATI",
+      "response_data": "serdevmock v1.0\r\n",
+      "delay_ms": 50
+    },
+    {
+      "request_pattern": "AT+CGMI",
+      "response_data": "Manufacturer\r\n",
+      "delay_ms": 100
+    },
+    {
+      "request_pattern": "AT+CGMM",
+      "response_data": "Model\r\n",
+      "delay_ms": 100
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "port": "COM3",
+  "baudrate": 9600,
+  "data_bits": 8,
+  "parity": "N",
+  "stop_bits": 1,
+  "echo_mode": false,
+  "response_rules": [
+    {
+      "request_pattern": "AT",
+      "response_data": "OK",
+      "delay_ms": 100
+    },
+    {
+      "request_pattern": "ATI",
+      "response_data": "serdevmock v1.0",
+      "delay_ms": 50
+    },
+    {
+      "request_pattern": "AT+CGMI",
+      "response_data": "Manufacturer",
+      "delay_ms": 100
+    },
+    {
+      "request_pattern": "AT+CGMM",
+      "response_data": "Model",
+      "delay_ms": 100
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "port": "COM10",
+  "baudrate": 9600,
+  "data_bits": 8,
+  "parity": "N",
+  "stop_bits": 1,
+  "echo_mode": true,
+  "response_rules": []
+}
