@@ -3,7 +3,6 @@
 import argparse
 import signal
 import sys
-import time
 from pathlib import Path
 from typing import NoReturn
 
@@ -37,7 +36,7 @@ def parse_args(args: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(args)
 
 
-def main() -> NoReturn:
+def main() -> None:
     """メイン関数"""
     args = parse_args()
 
@@ -67,13 +66,7 @@ def main() -> NoReturn:
     print("停止するにはCtrl+Cを押してください")
 
     emulator.start()
-
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        emulator.stop()
-        sys.exit(0)
+    emulator.run()
 
 
 if __name__ == "__main__":

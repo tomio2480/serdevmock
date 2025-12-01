@@ -23,6 +23,7 @@ class UARTEmulator(ProtocolEmulator):
         self.config = config
         self._serial: Optional[serial.Serial] = None
         self._socket: Optional[socket.socket] = None
+        self._client_socket: Optional[socket.socket] = None
         self._running = False
 
     def start(self) -> None:
@@ -50,20 +51,94 @@ class UARTEmulator(ProtocolEmulator):
 
         # ソケットを作成
         self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._socket.bind((host, port))
         self._socket.listen(1)
+        self._socket.settimeout(1.0)  # タイムアウトを設定
 
     def stop(self) -> None:
         """エミュレータを停止する"""
+        self._running = False
+        if self._client_socket:
+            try:
+                self._client_socket.close()
+            except Exception:
+                pass
         if self._serial and self._serial.is_open:
             self._serial.close()
         if self._socket:
             self._socket.close()
-        self._running = False
 
     def is_running(self) -> bool:
         """エミュレータが実行中かどうかを返す"""
         return self._running
+
+    def run(self) -> None:
+        """メインループを実行する"""
+        if self._socket:
+            self._run_tcp_server()
+        elif self._serial:
+            self._run_serial()
+
+    def _run_tcp_server(self) -> None:
+        """TCPサーバーのメインループ"""
+        if not self._socket:
+            return
+
+        print("クライアント接続を待機しています...")
+
+        while self._running:
+            try:
+                # クライアント接続を待機
+                if not self._client_socket:
+                    try:
+                        self._client_socket, addr = self._socket.accept()
+                        self._client_socket.settimeout(1.0)
+                        print(f"クライアント接続: {addr}")
+                    except socket.timeout:
+                        continue
+
+                # データ受信
+                try:
+                    data = self._client_socket.recv(1024)
+                    if not data:
+                        # 接続が切断された
+                        print("クライアント切断")
+                        self._client_socket.close()
+                        self._client_socket = None
+                        continue
+
+                    # リクエスト処理
+                    response = self._process_request(data)
+                    if response:
+                        self._client_socket.send(response)
+
+                except socket.timeout:
+                    continue
+                except Exception as e:
+                    print(f"エラー: {e}")
+                    if self._client_socket:
+                        self._client_socket.close()
+                        self._client_socket = None
+
+            except Exception as e:
+                print(f"サーバーエラー: {e}")
+                break
+
+    def _run_serial(self) -> None:
+        """シリアルポートのメインループ"""
+        while self._running:
+            try:
+                if self._serial and self._serial.in_waiting > 0:
+                    data = self._serial.read(self._serial.in_waiting)
+                    response = self._process_request(data)
+                    if response:
+                        self._serial.write(response)
+                else:
+                    time.sleep(0.1)
+            except Exception as e:
+                print(f"シリアルエラー: {e}")
+                break
 
     def _process_request(self, request: bytes) -> Optional[bytes]:
         """リクエストを処理して応答を返す

@@ -46,12 +46,8 @@ class TestMain:
         test_args = ["--port", "COM3", "--config", "config.json"]
         with patch.object(sys, "argv", ["serdevmock"] + test_args):
             with patch("serdevmock.cli.main.signal.signal"):
-                with patch("serdevmock.cli.main.time.sleep") as mock_sleep:
-                    mock_sleep.side_effect = KeyboardInterrupt()
-                    try:
-                        main()
-                    except SystemExit:
-                        pass
+                main()
 
         mock_loader.load.assert_called_once()
         mock_emulator.start.assert_called_once()
+        mock_emulator.run.assert_called_once()
