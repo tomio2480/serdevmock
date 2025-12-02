@@ -8,6 +8,7 @@ from typing import NoReturn
 
 from serdevmock.protocols.uart.config import UARTConfigLoader
 from serdevmock.protocols.uart.emulator import UARTEmulator
+from serdevmock.utils.vport_checker import VPortToolChecker
 
 
 def parse_args(args: list[str] | None = None) -> argparse.Namespace:
@@ -63,6 +64,24 @@ def main() -> None:
     print(f"設定ファイル: {args.config}")
     if hasattr(config, "echo_mode") and config.echo_mode:
         print("エコーモード: 有効")
+
+    # 仮想ポートを使用する場合のみツールチェックを実行
+    if not config.port.startswith("socket://"):
+        checker = VPortToolChecker()
+        status = checker.check()
+
+        if status.is_installed:
+            print(
+                f"仮想ポートツール: {status.tool_name} "
+                f"(バージョン: {status.version or '不明'})"
+            )
+        else:
+            print("\n" + "=" * 60)
+            print("警告: 仮想ポートツールが検出されませんでした")
+            print("=" * 60)
+            print(f"\n{status.get_install_instruction()}\n")
+            print("=" * 60 + "\n")
+
     print("停止するにはCtrl+Cを押してください")
 
     emulator.start()

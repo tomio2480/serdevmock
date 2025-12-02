@@ -10,7 +10,7 @@ serdevmockをWindowsで使用するためのセットアップガイドです。
 ## 1. serdevmockのインストール
 
 ```bash
-cd c:\Users\owner\OneDrive\ドキュメント\Works\serial-device-emulator
+cd /path/to/your/repo/serial-device-emulator
 pip install -e .
 ```
 
