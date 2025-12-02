@@ -1,6 +1,5 @@
 """仮想ポートツール検知機能のテスト"""
 
-import platform
 from unittest.mock import MagicMock, patch
 
 from serdevmock.utils.vport_checker import VPortToolChecker, VPortToolStatus
@@ -10,31 +9,39 @@ class TestVPortToolChecker:
     """VPortToolCheckerのテストクラス"""
 
     @patch("platform.system")
-    @patch("subprocess.run")
+    @patch("serdevmock.utils.vport_checker.serial")
     def test_check_windows_com0com_installed(
-        self, mock_run: MagicMock, mock_system: MagicMock
+        self, mock_serial: MagicMock, mock_system: MagicMock
     ) -> None:
         """Windowsでcom0comがインストールされている場合"""
         mock_system.return_value = "Windows"
-        mock_run.return_value = MagicMock(
-            returncode=0, stdout="com0com version 3.0.0.0"
-        )
+
+        # com0comポートをモック
+        mock_port = MagicMock()
+        mock_port.device = "COM10"
+        mock_port.description = "com0com - serial port emulator"
+        mock_serial.tools.list_ports.comports.return_value = [mock_port]
 
         checker = VPortToolChecker()
         status = checker.check()
 
         assert status.tool_name == "com0com"
         assert status.is_installed is True
-        assert status.version == "3.0.0.0"
+        assert status.version is None
 
     @patch("platform.system")
-    @patch("subprocess.run")
+    @patch("serdevmock.utils.vport_checker.serial")
     def test_check_windows_com0com_not_installed(
-        self, mock_run: MagicMock, mock_system: MagicMock
+        self, mock_serial: MagicMock, mock_system: MagicMock
     ) -> None:
         """Windowsでcom0comがインストールされていない場合"""
         mock_system.return_value = "Windows"
-        mock_run.side_effect = FileNotFoundError()
+
+        # com0comポートが存在しない
+        mock_port = MagicMock()
+        mock_port.device = "COM1"
+        mock_port.description = "Standard Serial Port"
+        mock_serial.tools.list_ports.comports.return_value = [mock_port]
 
         checker = VPortToolChecker()
         status = checker.check()

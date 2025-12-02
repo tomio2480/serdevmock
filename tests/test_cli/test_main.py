@@ -52,7 +52,7 @@ class TestMain:
         # 仮想ポートツールチェッカーをモック
         mock_checker = MagicMock()
         mock_status = VPortToolStatus(
-            tool_name="com0com", is_installed=True, version="3.0.0.0"
+            tool_name="com0com", is_installed=True, version=None
         )
         mock_checker.check.return_value = mock_status
         mock_checker_class.return_value = mock_checker

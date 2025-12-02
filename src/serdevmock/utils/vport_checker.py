@@ -6,6 +6,11 @@ import subprocess
 from dataclasses import dataclass
 from typing import Optional
 
+try:
+    import serial.tools.list_ports
+except ImportError:
+    serial = None  # type: ignore
+
 
 @dataclass
 class VPortToolStatus:
@@ -69,29 +74,35 @@ class VPortToolChecker:
         Returns:
             VPortToolStatus: com0comのステータス
         """
+        # pyserialを使ってシリアルポート一覧から検出
         try:
-            # setupc.exeの存在を確認
-            result = subprocess.run(
-                ["setupc", "--version"],
-                capture_output=True,
-                text=True,
-                timeout=5,
-            )
+            if serial is None:
+                return VPortToolStatus(
+                    tool_name="com0com",
+                    is_installed=False,
+                    platform_name="Windows",
+                )
 
-            # バージョン情報を抽出
-            version = None
-            if result.returncode == 0:
-                match = re.search(r"version\s+(\S+)", result.stdout, re.IGNORECASE)
-                if match:
-                    version = match.group(1)
+            ports = list(serial.tools.list_ports.comports())
+            com0com_ports = [
+                p for p in ports if "com0com" in p.description.lower()
+            ]
 
-            return VPortToolStatus(
-                tool_name="com0com",
-                is_installed=True,
-                version=version,
-                platform_name="Windows",
-            )
-        except (FileNotFoundError, subprocess.TimeoutExpired):
+            if com0com_ports:
+                # バージョン情報は取得できないが、インストールされていることは確認できる
+                return VPortToolStatus(
+                    tool_name="com0com",
+                    is_installed=True,
+                    version=None,
+                    platform_name="Windows",
+                )
+            else:
+                return VPortToolStatus(
+                    tool_name="com0com",
+                    is_installed=False,
+                    platform_name="Windows",
+                )
+        except Exception:
             return VPortToolStatus(
                 tool_name="com0com",
                 is_installed=False,
