@@ -84,9 +84,7 @@ class VPortToolChecker:
                 )
 
             ports = list(serial.tools.list_ports.comports())
-            com0com_ports = [
-                p for p in ports if "com0com" in p.description.lower()
-            ]
+            com0com_ports = [p for p in ports if "com0com" in p.description.lower()]
 
             if com0com_ports:
                 # バージョン情報は取得できないが、インストールされていることは確認できる

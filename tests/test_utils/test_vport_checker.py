@@ -57,9 +57,7 @@ class TestVPortToolChecker:
     ) -> None:
         """Linuxでsocatがインストールされている場合"""
         mock_system.return_value = "Linux"
-        mock_run.return_value = MagicMock(
-            returncode=0, stdout="socat version 1.7.4.1"
-        )
+        mock_run.return_value = MagicMock(returncode=0, stdout="socat version 1.7.4.1")
 
         checker = VPortToolChecker()
         status = checker.check()
@@ -91,9 +89,7 @@ class TestVPortToolChecker:
     ) -> None:
         """macOSでsocatがインストールされている場合"""
         mock_system.return_value = "Darwin"
-        mock_run.return_value = MagicMock(
-            returncode=0, stdout="socat version 1.8.0.0"
-        )
+        mock_run.return_value = MagicMock(returncode=0, stdout="socat version 1.8.0.0")
 
         checker = VPortToolChecker()
         status = checker.check()
