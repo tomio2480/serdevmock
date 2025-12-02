@@ -31,18 +31,18 @@
 
 ## インストール
 
-### 開発版インストール
-
-```bash
-git clone <repository-url>
-cd serdevmock
-pip install -e ".[dev]"
-```
-
-### 通常インストール
+### pipからインストール（推奨）
 
 ```bash
 pip install serdevmock
+```
+
+### 開発版インストール
+
+```bash
+git clone https://github.com/tomio2480/serdevmock.git
+cd serdevmock
+pip install -e ".[dev]"
 ```
 
 ## 使い方

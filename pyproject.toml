@@ -3,15 +3,36 @@ name = "serdevmock"
 version = "0.1.0"
 description = "シリアル通信デバイスモックツール - UART/SPI/I2C対応の軽量エミュレータ"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "Shota Nishihara", email = "tomio2480@gmail.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
+keywords = ["serial", "uart", "spi", "i2c", "mock", "emulator", "testing", "hardware"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Testing :: Mocking",
+    "Topic :: System :: Hardware",
+    "Operating System :: OS Independent",
+]
 
 dependencies = [
     "pyserial>=3.5",
 ]
+
+[project.urls]
+Homepage = "https://github.com/tomio2480/serdevmock"
+Repository = "https://github.com/tomio2480/serdevmock"
+Issues = "https://github.com/tomio2480/serdevmock/issues"
+Changelog = "https://github.com/tomio2480/serdevmock/blob/main/CHANGELOG.md"
+
 
 [project.optional-dependencies]
 dev = [
