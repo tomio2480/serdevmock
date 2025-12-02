@@ -2,7 +2,7 @@
 
 from unittest.mock import MagicMock, patch
 
-from serdevmock.utils.vport_checker import VPortToolChecker, VPortToolStatus
+from serdevmock.utils.vport_checker import VPortToolChecker
 
 
 class TestVPortToolChecker:
