@@ -51,9 +51,13 @@ pip install serdevmock
 
 serdevmockを使用するには、仮想COMポートペアを作成するか、TCPソケットモードを使用します。
 
-#### 方法1: TCPソケットモード（推奨・マルチプラットフォーム対応）
+**詳細は [docs/VIRTUAL_PORTS.md](docs/VIRTUAL_PORTS.md) を参照してください。**
+
+#### 方法1: TCPソケットモード（pyserial対応アプリケーション向け）
 
 外部ツール不要で、すべてのOSで動作します。
+
+**注意:** 一部のシリアル通信ライブラリは`socket://`プロトコルに対応していません。その場合は方法2を使用してください。
 
 ```bash
 # serdevmockをソケットモードで起動
@@ -65,33 +69,26 @@ python examples/test_socket_client.py
 
 詳細は [docs/SOCKET_MODE.md](docs/SOCKET_MODE.md) を参照してください。
 
-#### 方法2: Windows - com0com
+#### 方法2: 仮想COMポートペア（推奨・すべてのアプリケーション対応）
 
-1. [com0com](https://sourceforge.net/projects/com0com/)をダウンロード・インストール
-2. Setup Command Promptで仮想ポートペアを作成（例: COM10とCOM11）
-3. 設定ファイルでCOM10を指定し、テスト対象アプリケーションはCOM11に接続
+実際のCOMポート名を使用したい場合や、既存のシリアル通信ライブラリをそのまま使いたい場合はこの方法を推奨します。
 
+**Windows: com0com**
 ```bash
-# インストール後、利用可能なポートを確認
-python -c "import serial.tools.list_ports; [print(f'{p.device}: {p.description}') for p in serial.tools.list_ports.comports()]"
+# 仮想ポートペアを作成（初回のみ）
+install PortName=COM10 PortName=COM11
 ```
 
-詳細は [docs/QUICKSTART_WINDOWS.md](docs/QUICKSTART_WINDOWS.md) を参照してください。
-
-#### 方法3: Linux/macOS - socat
-
+**Linux/macOS: socat**
 ```bash
 # 仮想シリアルポートペアを作成
 socat -d -d pty,raw,echo=0 pty,raw,echo=0
 # 出力例:
 # 2024/12/02 10:00:00 socat[12345] N PTY is /dev/pts/2
 # 2024/12/02 10:00:00 socat[12345] N PTY is /dev/pts/3
-
-# 別のターミナルでserdevmockを起動
-serdevmock --protocol uart --port /dev/pts/2 --config examples/at_command.json
-
-# テスト対象アプリケーションは /dev/pts/3 に接続
 ```
+
+各OSでの詳細な手順、トラブルシューティング、自動起動設定は [docs/VIRTUAL_PORTS.md](docs/VIRTUAL_PORTS.md) を参照してください。
 
 ### 基本的な使用方法
 
