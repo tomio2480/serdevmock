@@ -30,6 +30,10 @@ env/
 .coverage
 htmlcov/
 coverage/
+coverage.xml
+
+# Working files
+task.md
 
 # IDE
 .vscode/
