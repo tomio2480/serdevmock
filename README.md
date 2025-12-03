@@ -196,6 +196,23 @@ pytest --cov=src/serdevmock --cov-report=html
 
 ### コード品質チェック
 
+#### ローカルでの CI チェック（推奨）
+
+GitHub Actions で実行される品質チェックをローカルで実行できます。
+
+```powershell
+# すべてのチェックを一括実行
+.\check.ps1 all
+
+# 個別のチェック実行
+.\check.ps1 black   # コードフォーマットチェック
+.\check.ps1 flake8  # コードスタイルチェック
+.\check.ps1 mypy    # 型チェック
+.\check.ps1 pytest  # テスト実行
+```
+
+#### 手動での品質チェック
+
 ```bash
 # コードフォーマット
 black src tests

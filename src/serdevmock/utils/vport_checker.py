@@ -4,12 +4,13 @@ import platform
 import re
 import subprocess
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 
+serial: Any
 try:
     import serial.tools.list_ports
 except ImportError:
-    serial = None  # type: ignore
+    serial = None
 
 
 @dataclass
