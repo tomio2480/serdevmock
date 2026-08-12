@@ -3,6 +3,12 @@ name: Publish to PyPI
 on:
   release:
     types: [published]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'アップロードを行わず，ビルドと twine check だけ実行する'
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -31,7 +37,15 @@ jobs:
       run: twine check dist/*
 
     - name: Publish to PyPI
+      if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
-      run: twine upload dist/*
+      run: twine upload --skip-existing dist/*
+
+    - name: Skip publish (dry run)
+      if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+      run: |
+        echo "dry run のためアップロードを行いませんでした．"
+        echo "ビルド成果物は以下のとおりです．"
+        ls -l dist
