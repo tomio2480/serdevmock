@@ -3,12 +3,9 @@ name: Publish to PyPI
 on:
   release:
     types: [published]
+  # 手動実行はビルドと twine check の確認専用である．
+  # 任意の ref を選べてしまうため，アップロードは行わない．
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'アップロードを行わず，ビルドと twine check だけ実行する'
-        type: boolean
-        default: true
 
 permissions:
   contents: read
@@ -37,15 +34,15 @@ jobs:
       run: twine check dist/*
 
     - name: Publish to PyPI
-      if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && !inputs.dry_run)
+      if: github.event_name == 'release'
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
       run: twine upload --skip-existing dist/*
 
-    - name: Skip publish (dry run)
-      if: github.event_name == 'workflow_dispatch' && inputs.dry_run
+    - name: Skip publish (manual run)
+      if: github.event_name != 'release'
       run: |
-        echo "dry run のためアップロードを行いませんでした．"
+        echo "手動実行のためアップロードを行いませんでした．"
         echo "ビルド成果物は以下のとおりです．"
         ls -l dist
